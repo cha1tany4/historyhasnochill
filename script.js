@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────────────────────
 // EVENT DATABASE
 // ──────────────────────────────────────────────────────────────
-const EVENTS = [
+const events = [
   { name: "the Wright Brothers' first flight", date: "1903-12-17", url: "https://en.wikipedia.org/wiki/Wright_brothers" },
   { name: "the Tunguska event", date: "1908-06-30", url: "https://en.wikipedia.org/wiki/Tunguska_event" },
   { name: "the sinking of the Titanic", date: "1912-04-15", url: "https://en.wikipedia.org/wiki/Titanic" },
@@ -365,15 +365,15 @@ function surpriseScore(yearA, yearB) {
 
 function buildTopPairs() {
   const scored = [];
-  for (let i = 0; i < EVENTS.length; i++) {
-    for (let j = i + 1; j < EVENTS.length; j++) {
-      const yearA = yearOf(EVENTS[i].date);
-      const yearB = yearOf(EVENTS[j].date);
+  for (let i = 0; i < events.length; i++) {
+    for (let j = i + 1; j < events.length; j++) {
+      const yearA = yearOf(events[i].date);
+      const yearB = yearOf(events[j].date);
       const score = surpriseScore(yearA, yearB);
       if (score === null) continue;
       scored.push({
-        a:       EVENTS[i],
-        b:       EVENTS[j],
+        a:       events[i],
+        b:       events[j],
         score:   score,
         yearGap: Math.abs(yearA - yearB),
       });
