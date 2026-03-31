@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>You are older than you think</title>
+        <meta
+            name="description"
+            content="Find out how old you really are — not in years, but in historic events. Enter your birthday and see what happened closer to your birth than to today."
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+        />
+        <style>
+            body {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .container {
+                max-width: 720px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+                margin-bottom: 2rem;
+            }
+
+            .card-sentence {
+                font-size: 1.4rem;
+                line-height: 1.5;
+                margin-bottom: 1.5rem;
+            }
+
+            .timeline-track {
+                position: relative;
+                height: 6px;
+                background: var(--pico-secondary-background);
+                border-radius: 3px;
+                margin-bottom: 2rem;
+            }
+
+            .timeline-fill {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                background: var(--pico-primary);
+                border-radius: 3px;
+            }
+
+            .timeline-marker {
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .timeline-marker::before {
+                content: "";
+                display: block;
+                width: 12px;
+                height: 12px;
+                background: var(--pico-primary);
+                border-radius: 50%;
+                border: 2px solid var(--pico-background-color);
+            }
+
+            .marker-label {
+                position: absolute;
+                top: 14px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 0.65rem;
+                color: var(--pico-primary);
+                white-space: nowrap;
+            }
+
+            .timeline-ends {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.7rem;
+                color: var(--pico-muted-color);
+            }
+
+            footer {
+                margin-top: 1rem;
+                font-size: 0.75rem;
+                color: var(--pico-muted-color);
+                text-align: center;
+            }
+
+            footer a {
+                color: var(--pico-muted-color);
+            }
+
+            .card-sentence a {
+                color: inherit;
+                text-decoration: underline;
+                text-underline-offset: 3px;
+                text-decoration-color: var(--pico-primary);
+            }
+
+            .card-sentence a:hover {
+                color: var(--pico-primary);
+            }
+        </style>
+    </head>
+    <body>
+        <main class="container">
+            <h1>You are older than you think.</h1>
+
+            <label for="birthdayInput">
+                When were you born?
+                <input
+                    type="date"
+                    id="birthdayInput"
+                    min="1930-01-01"
+                    max="2023-12-31"
+                />
+            </label>
+
+            <article id="card" hidden></article>
+
+            <button onclick="generate()">Make me feel old</button>
+        </main>
+
+        <footer class="container">
+            Remade by
+            <a
+                href="https://thefield.blog/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Chaitanya</a
+            >
+            · Original concept by
+            <a
+                href="https://profmusgrave.github.io/anotherday/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Paul Musgrave</a
+            >
+            · Special thanks to
+            <a
+                href="https://www.instagram.com/prakarot.exe/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Pranay</a
+            >
+            <br /><br />
+            Your birthday is saved in your browser's local storage only. No
+            cookies, no tracking. This page uses GoatCounter for
+            privacy-friendly analytics (no personal data collected). It also
+            loads a stylesheet from jsDelivr (a CDN), which may log your IP.
+            Hosted on GitHub Pages.
+        </footer>
+
+        <script src="script.js"></script>
+        <script
+            data-goatcounter="https://makemefeelold.goatcounter.com/count"
+            async
+            src="//gc.zgo.at/count.js"
+        ></script>
+    </body>
+</html>
