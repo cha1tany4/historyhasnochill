@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────────────────────
 // EVENT DATABASE
 // ──────────────────────────────────────────────────────────────
-const events = [
+const EVENTS = [
   { name: "the Wright Brothers' first flight", date: "1903-12-17", url: "https://en.wikipedia.org/wiki/Wright_brothers" },
   { name: "the Tunguska event", date: "1908-06-30", url: "https://en.wikipedia.org/wiki/Tunguska_event" },
   { name: "the sinking of the Titanic", date: "1912-04-15", url: "https://en.wikipedia.org/wiki/Titanic" },
@@ -320,124 +320,140 @@ const events = [
   { name: "a Rajasthani folk dance troupe baffling and delighting audiences at the Edinburgh Festival", date: "1998-04-25", url: "https://en.wikipedia.org/wiki/Kachchi_Ghori" },
   { name: "the Amul Girl turning 36 — having commented on every Indian news event since 1966", date: "2001-09-08", url: "https://en.wikipedia.org/wiki/Amul_girl" },
   { name: "India waiting 28 years for its next individual Olympic gold after Moscow 1980", date: "1980-07-23", url: "https://en.wikipedia.org/wiki/Abhinav_Bindra" },
-  { name: "India deliberately crashing a probe into the Moon — and celebrating", date: "2008-11-14", url: "https://en.wikipedia.org/wiki/Moon_Impact_Probe" }
+  { name: "India deliberately crashing a probe into the Moon — and celebrating", date: "2008-11-14", url: "https://en.wikipedia.org/wiki/Moon_Impact_Probe" },
 ];
 
 // ──────────────────────────────────────────────────────────────
-// DATE UTILITIES
+// CONSTANTS
 // ──────────────────────────────────────────────────────────────
-const MS_PER_DAY  = 86400000;
-const MS_PER_YEAR = 365.2425 * MS_PER_DAY;
+const TOP_N          = 500;
+const MONTH_NAMES    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-function parseDate(str) {
-  const m = str.match(/^(-?\d+)-(\d{2})-(\d{2})$/);
-  if (!m) return null;
-  const year  = parseInt(m[1], 10);
-  const month = parseInt(m[2], 10) - 1;
-  const day   = parseInt(m[3], 10);
-  if (year >= 0) {
-    const d = new Date(Date.UTC(year, month, day));
-    d.setUTCFullYear(year);
-    return d.getTime();
+// ──────────────────────────────────────────────────────────────
+// UTILITIES
+// ──────────────────────────────────────────────────────────────
+function yearOf(dateStr) {
+  return parseInt(dateStr.slice(0, 4), 10);
+}
+
+function fmtDate(dateStr) {
+  const year  = parseInt(dateStr.slice(0, 4), 10);
+  const month = parseInt(dateStr.slice(5, 7), 10);
+  return `${MONTH_NAMES[month - 1]} ${year}`;
+}
+
+function escHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ──────────────────────────────────────────────────────────────
+// SCORING
+// ──────────────────────────────────────────────────────────────
+
+// Score = perceived_decades / actual_years.
+// Higher score = more surprising (many perceived decades, few actual years).
+function surpriseScore(yearA, yearB) {
+  const perceivedDecades = Math.abs(Math.floor(yearA / 10) - Math.floor(yearB / 10));
+  const actualYears      = Math.abs(yearA - yearB);
+  if (perceivedDecades === 0 || actualYears === 0) return null;
+  return perceivedDecades / actualYears;
+}
+
+function buildTopPairs() {
+  const scored = [];
+  for (let i = 0; i < EVENTS.length; i++) {
+    for (let j = i + 1; j < EVENTS.length; j++) {
+      const yearA = yearOf(EVENTS[i].date);
+      const yearB = yearOf(EVENTS[j].date);
+      const score = surpriseScore(yearA, yearB);
+      if (score === null) continue;
+      scored.push({
+        a:       EVENTS[i],
+        b:       EVENTS[j],
+        score:   score,
+        yearGap: Math.abs(yearA - yearB),
+      });
+    }
   }
-  const monthDays = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-  return year * MS_PER_YEAR + (monthDays[month] + day - 1) * MS_PER_DAY;
-}
-
-function daysBetween(a, b) { return Math.abs(b - a) / MS_PER_DAY; }
-
-function fmtDate(str) {
-  const m = str.match(/^(-?\d+)-(\d{2})-(\d{2})$/);
-  const year  = parseInt(m[1], 10);
-  const month = parseInt(m[2], 10);
-  const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  if (year < 0) return `${Math.abs(year)} BC`;
-  if (year < 1000) return `${names[month-1]} ${year} AD`;
-  return `${names[month-1]} ${year}`;
+  scored.sort((x, y) => y.score - x.score);
+  return scored.slice(0, TOP_N);
 }
 
 // ──────────────────────────────────────────────────────────────
-// SENTENCE CONSTRUCTION
+// SESSION STATE
 // ──────────────────────────────────────────────────────────────
-function buildSentence(ev) {
-  return `You were born closer to <a href="${ev.url}" target="_blank" rel="noopener noreferrer"><strong>${ev.name}</strong></a> than to the present day.`;
+let sessionQueue = [];
+let sessionIndex = 0;
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function initSession() {
+  sessionQueue = buildTopPairs();
+  shuffle(sessionQueue);
+  sessionIndex = 0;
 }
 
 // ──────────────────────────────────────────────────────────────
-// RENDER
+// RENDERING
 // ──────────────────────────────────────────────────────────────
-function renderCard(ev, birthdayStr) {
-  const eventMs    = parseDate(ev.date);
-  const birthdayMs = parseDate(birthdayStr);
-  const todayMs    = Date.now();
+function renderPair(pair) {
+  const { a, b, yearGap } = pair;
+  const yearA = yearOf(a.date);
+  const yearB = yearOf(b.date);
 
-  const sentence = buildSentence(ev);
+  // Top card = earlier event
+  const [top, bottom] = yearA <= yearB ? [a, b] : [b, a];
 
-  const totalSpan   = todayMs - eventMs;
-  const birthdayPct = Math.min(100, Math.max(0,
-    ((birthdayMs - eventMs) / totalSpan) * 100
-  )).toFixed(1);
+  const pairDisplay = document.getElementById('pairDisplay');
+  pairDisplay.innerHTML = `
+    <div class="event-pair">
+      <article class="event-card">
+        <h2 class="event-name">
+          <a href="${escHtml(top.url)}" target="_blank" rel="noopener noreferrer">${escHtml(top.name)}</a>
+        </h2>
+        <p class="event-date">${fmtDate(top.date)}</p>
+      </article>
 
-  const card = document.getElementById('card');
-  card.innerHTML = `
-    <p class="card-sentence">${sentence}</p>
-    <div class="timeline-track">
-      <div class="timeline-fill" style="width:${birthdayPct}%"></div>
-      <div class="timeline-marker" style="left:${birthdayPct}%">
-        <span class="marker-label">You were born</span>
+      <div class="gap-badge" aria-label="${yearGap} ${yearGap === 1 ? 'year' : 'years'} apart">
+        <span class="gap-number">${yearGap}</span>
+        <span class="gap-label">${yearGap === 1 ? 'year' : 'years'}<br>apart</span>
       </div>
-    </div>
-    <div class="timeline-ends">
-      <span>${fmtDate(ev.date)}</span>
-      <span>Today</span>
+
+      <article class="event-card">
+        <h2 class="event-name">
+          <a href="${escHtml(bottom.url)}" target="_blank" rel="noopener noreferrer">${escHtml(bottom.name)}</a>
+        </h2>
+        <p class="event-date">${fmtDate(bottom.date)}</p>
+      </article>
     </div>
   `;
-  card.hidden = false;
+  pairDisplay.hidden = false;
 }
 
 // ──────────────────────────────────────────────────────────────
-// GENERATE
+// ENTRY POINT
 // ──────────────────────────────────────────────────────────────
-function generate() {
-  const birthdayStr = document.getElementById('birthdayInput').value;
-  if (!birthdayStr) {
-    const inp = document.getElementById('birthdayInput');
-    inp.setAttribute('aria-invalid', 'true');
-    inp.focus();
+function showNext() {
+  if (sessionIndex >= sessionQueue.length) {
+    const btn = document.getElementById('nextBtn');
+    btn.disabled = true;
+    btn.textContent = "That's all the surprises for now!";
     return;
   }
-  document.getElementById('birthdayInput').removeAttribute('aria-invalid');
-
-  const birthdayMs = parseDate(birthdayStr);
-  const todayMs    = Date.now();
-  const ageMs      = todayMs - birthdayMs;
-
-  // Only pick events where birthday is closer to the event than to today
-  const eligible = events.filter(ev => {
-    const eventMs = parseDate(ev.date);
-    return eventMs < birthdayMs && (birthdayMs - eventMs) < ageMs;
-  });
-
-  const pool = eligible.length > 0 ? eligible : events;
-  const ev   = pool[Math.floor(Math.random() * pool.length)];
-  renderCard(ev, birthdayStr);
+  renderPair(sessionQueue[sessionIndex++]);
 }
 
-// ──────────────────────────────────────────────────────────────
-// INIT
-// ──────────────────────────────────────────────────────────────
-const birthdayInput = document.getElementById('birthdayInput');
-
-const savedBirthday = localStorage.getItem('birthday');
-if (savedBirthday) {
-  birthdayInput.value = savedBirthday;
-}
-
-birthdayInput.addEventListener('change', function () {
-  if (this.value) {
-    localStorage.setItem('birthday', this.value);
-  } else {
-    localStorage.removeItem('birthday');
-    document.getElementById('card').hidden = true;
-  }
+document.addEventListener('DOMContentLoaded', () => {
+  initSession();
+  document.getElementById('nextBtn').addEventListener('click', showNext);
+  showNext();
 });

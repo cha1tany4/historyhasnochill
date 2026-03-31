@@ -3,10 +3,10 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>You are older than you think</title>
+        <title>History Has No Chill</title>
         <meta
             name="description"
-            content="Find out how old you really are — not in years, but in historic events. Enter your birthday and see what happened closer to your birth than to today."
+            content="Two events from history that feel centuries apart — but actually happened within years of each other."
         />
         <link
             rel="stylesheet"
@@ -17,151 +17,179 @@
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
+            }
+
+            main.container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
                 justify-content: center;
+                padding-top: 1rem;
+                padding-bottom: 2rem;
             }
 
             .container {
                 max-width: 720px;
             }
 
-            h1 {
-                font-size: 1.4rem;
-                margin-bottom: 2rem;
-            }
-
-            .card-sentence {
-                font-size: 1.4rem;
-                line-height: 1.5;
-                margin-bottom: 1.5rem;
-            }
-
-            .timeline-track {
-                position: relative;
-                height: 6px;
-                background: var(--pico-secondary-background);
-                border-radius: 3px;
-                margin-bottom: 2rem;
-            }
-
-            .timeline-fill {
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                background: var(--pico-primary);
-                border-radius: 3px;
-            }
-
-            .timeline-marker {
-                position: absolute;
-                top: 50%;
-                transform: translate(-50%, -50%);
-            }
-
-            .timeline-marker::before {
-                content: "";
-                display: block;
-                width: 12px;
-                height: 12px;
-                background: var(--pico-primary);
-                border-radius: 50%;
-                border: 2px solid var(--pico-background-color);
-            }
-
-            .marker-label {
-                position: absolute;
-                top: 14px;
-                left: 50%;
-                transform: translateX(-50%);
-                font-size: 0.65rem;
-                color: var(--pico-primary);
-                white-space: nowrap;
-            }
-
-            .timeline-ends {
-                display: flex;
-                justify-content: space-between;
-                font-size: 0.7rem;
-                color: var(--pico-muted-color);
-            }
-
-            footer {
-                margin-top: 1rem;
-                font-size: 0.75rem;
-                color: var(--pico-muted-color);
+            header.container {
+                padding-top: 2.5rem;
+                padding-bottom: 1rem;
                 text-align: center;
             }
 
-            footer a {
-                color: var(--pico-muted-color);
+            header h1 {
+                font-size: 1.75rem;
+                margin-bottom: 0.25rem;
             }
 
-            .card-sentence a {
+            .subtitle {
+                color: var(--pico-muted-color);
+                font-size: 0.95rem;
+                margin-bottom: 0;
+            }
+
+            /* ── Pair layout ── */
+            .event-pair {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            /* ── Event card ── */
+            article.event-card {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                margin-bottom: 0;
+            }
+
+            .event-name {
+                font-size: 1rem;
+                line-height: 1.4;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+            }
+
+            .event-name a {
                 color: inherit;
                 text-decoration: underline;
                 text-underline-offset: 3px;
                 text-decoration-color: var(--pico-primary);
             }
 
-            .card-sentence a:hover {
+            .event-name a:hover {
                 color: var(--pico-primary);
             }
+
+            .event-date {
+                font-size: 0.85rem;
+                color: var(--pico-muted-color);
+                margin-bottom: 0;
+                font-variant-numeric: tabular-nums;
+            }
+
+            /* ── Gap badge ── */
+            .gap-badge {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                align-self: center;
+                width: 88px;
+                height: 88px;
+                border-radius: 50%;
+                background: var(--pico-primary);
+                color: var(--pico-primary-inverse);
+                text-align: center;
+                flex-shrink: 0;
+                line-height: 1;
+                box-shadow:
+                    0 0 0 4px var(--pico-background-color),
+                    0 0 0 7px var(--pico-primary);
+            }
+
+            .gap-number {
+                font-size: 1.9rem;
+                font-weight: 700;
+                display: block;
+                line-height: 1;
+            }
+
+            .gap-label {
+                font-size: 0.6rem;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                display: block;
+                margin-top: 3px;
+                line-height: 1.3;
+            }
+
+            /* ── Action row ── */
+            .action-row {
+                text-align: center;
+                margin-top: 0.5rem;
+            }
+
+            #nextBtn {
+                min-width: 200px;
+            }
+
+            /* ── Footer ── */
+            footer.container {
+                font-size: 0.75rem;
+                color: var(--pico-muted-color);
+                text-align: center;
+                padding-bottom: 2rem;
+            }
+
+            footer a {
+                color: var(--pico-muted-color);
+            }
+
+            footer a:hover {
+                color: var(--pico-primary);
+            }
+
         </style>
     </head>
     <body>
+        <header class="container">
+            <h1>History Has No Chill</h1>
+            <p class="subtitle">
+                Two events that feel centuries apart, actually happened within years of each other.
+            </p>
+        </header>
+
         <main class="container">
-            <h1>You are older than you think.</h1>
-
-            <label for="birthdayInput">
-                When were you born?
-                <input
-                    type="date"
-                    id="birthdayInput"
-                    min="1930-01-01"
-                    max="2023-12-31"
-                />
-            </label>
-
-            <article id="card" hidden></article>
-
-            <button onclick="generate()">Make me feel old</button>
+            <section
+                id="pairDisplay"
+                hidden
+                aria-live="polite"
+                aria-atomic="true"
+            ></section>
+            <div class="action-row">
+                <button id="nextBtn">Show me another</button>
+            </div>
         </main>
 
         <footer class="container">
-            Remade by
-            <a
-                href="https://thefield.blog/"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Chaitanya</a
-            >
-            · Original concept by
-            <a
-                href="https://profmusgrave.github.io/anotherday/"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Paul Musgrave</a
-            >
-            · Special thanks to
-            <a
-                href="https://www.instagram.com/prakarot.exe/"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Pranay</a
-            >
-            <br /><br />
-            Your birthday is saved in your browser's local storage only. No
-            cookies, no tracking. This page uses GoatCounter for
-            privacy-friendly analytics (no personal data collected). It also
-            loads a stylesheet from jsDelivr (a CDN), which may log your IP.
-            Hosted on GitHub Pages.
+            Made by
+            <a href="https://thefield.blog/" target="_blank" rel="noopener noreferrer">Chaitanya</a>
+            · Events sourced from
+            <a href="https://cha1tany4.github.io/makemefeelold/" target="_blank" rel="noopener noreferrer">Make Me Feel Old</a>
+            <br>
+            No cookies, no tracking. This page uses GoatCounter for privacy-friendly analytics (no personal data collected). It also loads a stylesheet from jsDelivr (a CDN), which may log your IP. Hosted on GitHub Pages.
         </footer>
 
         <script src="script.js"></script>
-        <script
-            data-goatcounter="https://makemefeelold.goatcounter.com/count"
-            async
-            src="//gc.zgo.at/count.js"
-        ></script>
+        <script data-goatcounter="https://historyhasnochill.goatcounter.com/count"
+                async src="//gc.zgo.at/count.js"></script>
     </body>
 </html>
